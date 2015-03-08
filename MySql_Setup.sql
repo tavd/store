@@ -1,5 +1,4 @@
--- login with root to create user, DB and table and provide grants
- 
+
 create user 't'@'localhost' identified by 'avd';
 
 grant all on *.* to 't'@'localhost' identified by 'avd';
