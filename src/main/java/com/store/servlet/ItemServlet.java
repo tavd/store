@@ -32,59 +32,30 @@ public class ItemServlet extends HttpServlet {
         protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
 
-//            RequestDispatcher rd = getServletContext().getRequestDispatcher("item-list.jsp");
 
-
+            request.getRequestDispatcher("item-list.jsp").forward(request,response);
             Connection con = (Connection) getServletContext().getAttribute("DBConnection");
             PreparedStatement ps = null;
             ResultSet rs = null;
-
+            List<Item> itemList = new ArrayList<Item>();
             try {
-                ps = con.prepareStatement("select name, description, category, price from item ");
+                ps = con.prepareStatement("select name, description, category, price from item");
 
                 rs = ps.executeQuery();
-//                if(rs != null){
-//                    rs.next();
-//                    Item item = new Item(rs.getString("name"), rs.getString("description"), rs.getString("category"), rs.getLong("price"));
-//                    logger.info("Item found "+item);
-//                    HttpSession session = request.getSession();
-//                    session.setAttribute("itemList", item);
-//                    response.sendRedirect("item-list.jsp");
-//
-//
-//                }
 
-//                 ArrayList item = new ArrayList();
-//
-//                    while (rs.next()) {
-//                        String[] row = new String[3];
-//                        row[0]=rs.getString(2);
-//                        item.add(row[0]);
-//                    }
-//
-//                    request.setAttribute("itemList", item);
-//                    RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("item-list.jsp");
-//                    dispatcher.forward(request,response);
+                while(rs.next())
+                {
+                    String name = request.getParameter("name");
+                    String description = request.getParameter("description");
+                    String category = request.getParameter("category");
+                    Double price = Double.parseDouble(request.getParameter("price"));
 
-                String name = request.getParameter("name");
-                String description = request.getParameter("description");
-                String category = request.getParameter("category");
+                    itemList.add(new Item(name, description, category, price));
 
-                ArrayList item = new ArrayList();                do {
-                    item.add(rs.getString("item"));
-                } while (rs.next());
+                    itemList.add(new Item(rs.getString("name"), rs.getString("description"), rs.getString("category"), rs.getDouble("price")));
+                    request.setAttribute("itemList", itemList);
+                    request.getRequestDispatcher("item-list.jsp").forward(request, response);
 
-                // Create a new HTTPSession and save the username and roles
-                // First, invalidate the session. if any
-                HttpSession session = request.getSession(false);
-                if (session != null) {
-                    session.invalidate();
-                }
-                session = request.getSession(true);
-                synchronized (session) {
-                    session.setAttribute("name", name);
-                    session.setAttribute("roles", description);
-                    session.setAttribute("category", category);
 
                 }
 
@@ -105,8 +76,13 @@ public class ItemServlet extends HttpServlet {
                 }
 
             }
-
-//            request.getRequestDispatcher("item-list.jsp").forward(request, response);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("item-list.jsp");
+            if (dispatcher != null){
+                dispatcher.forward(request, response);
     }
+
+
+        }
+
 }
 
